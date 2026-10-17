@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TearTime: Free Eye Drop Reminder for Mac (Menu Bar App)</title>
+<meta name="description" content="TearTime is a free macOS menu bar app that reminds you to use eye drops based on real screen time, with a daily limit and a contribution-style history grid. Also does blink-break style reminders. macOS 15+.">
+<link rel="canonical" href="https://teartime.vercel.app/en/">
+<link rel="alternate" hreflang="ko" href="https://teartime.vercel.app/">
+<link rel="alternate" hreflang="en" href="https://teartime.vercel.app/en/">
+<link rel="alternate" hreflang="x-default" href="https://teartime.vercel.app/en/">
+<link rel="icon" href="/favicon.png">
+<link rel="apple-touch-icon" href="/img/icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TearTime: Free Eye Drop Reminder for Mac">
+<meta property="og:description" content="Counts real screen time and tells you when it's time for eye drops.">
+<meta property="og:url" content="https://teartime.vercel.app/en/">
+<meta property="og:image" content="https://teartime.vercel.app/img/reminder-en.png">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"SoftwareApplication","name":"TearTime","operatingSystem":"macOS 15+","applicationCategory":"HealthApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"downloadUrl":"https://github.com/d4ymonth/teartime/releases/latest/download/TearTime.zip","image":"https://teartime.vercel.app/img/icon.png","inLanguage":["en","ko","ja","de","zh-Hans"]},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Is TearTime free?","acceptedAnswer":{"@type":"Answer","text":"Yes. It is free and open source on GitHub."}},
+{"@type":"Question","name":"macOS says it cannot verify the app. What do I do?","acceptedAnswer":{"@type":"Answer","text":"TearTime is distributed outside the App Store and is not notarized. Open System Settings, Privacy and Security, and click Open Anyway."}},
+{"@type":"Question","name":"Does it send my data anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. Your history and settings stay on your Mac."}},
+{"@type":"Question","name":"How is this different from a 20-20-20 break timer?","acceptedAnswer":{"@type":"Answer","text":"Break timers remind you to look away. TearTime tracks eye drops: how many times you used them today, a daily limit, and a long-term history."}}
+]}]}
+</script>
+<style>
+:root{--bg:#f7fafd;--fg:#0f1b2b;--mut:#5a6b80;--card:#fff;--line:#e3eaf3;--acc:#1272e6;--acc2:#0b5bc2}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1420;--fg:#e8eef7;--mut:#9aabc0;--card:#152031;--line:#22324a;--acc:#4ea3ff;--acc2:#7cbaff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
+a{color:var(--acc)}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+header .brand{display:flex;gap:10px;align-items:center;font-weight:700;text-decoration:none;color:var(--fg)}
+header img{width:32px;height:32px}
+.lang{font-size:14px;color:var(--mut)}
+.hero{text-align:center;padding:48px 0 32px}
+.hero img.icon{width:112px;height:112px}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.2;margin:16px 0 12px;letter-spacing:-0.02em}
+.lead{color:var(--mut);font-size:18px;max-width:600px;margin:0 auto 28px}
+.btn{display:inline-block;background:var(--acc);color:#fff;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:12px;font-size:17px}
+.btn:hover{background:var(--acc2)}
+.note{font-size:13px;color:var(--mut);margin-top:10px}
+.shots{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:32px 0}
+.shots img{width:100%;height:auto;border-radius:16px;border:1px solid var(--line);background:#fff}
+@media (max-width:640px){.shots{grid-template-columns:1fr}}
+section{padding:28px 0;border-top:1px solid var(--line)}
+h2{font-size:24px;margin:0 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h3{margin:0 0 6px;font-size:17px}
+.card p{margin:0;color:var(--mut);font-size:15px}
+ol li{margin-bottom:8px}
+code{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:14px}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:10px}
+summary{font-weight:700;cursor:pointer}
+footer{padding:32px 0 48px;color:var(--mut);font-size:14px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="brand" href="/en/"><img src="/img/icon.png" alt="">TearTime</a>
+  <a class="lang" href="/" hreflang="ko">한국어</a>
+</header>
+
+<main>
+<div class="hero">
+  <img class="icon" src="/img/icon.png" alt="TearTime app icon" width="112" height="112">
+  <h1>The eye drop reminder<br>for people who live on their Mac</h1>
+  <p class="lead">TearTime counts the time you actually spend at your screen and pops up a gentle reminder when it's time for eye drops. Free, private, and tiny in your menu bar.</p>
+  <a class="btn" href="https://github.com/d4ymonth/teartime/releases/latest/download/TearTime.zip">Download free (macOS 15+)</a>
+  <p class="note">Apple silicon and Intel. Read the install note below first.</p>
+</div>
+
+<div class="shots">
+  <img src="/img/reminder-en.png" alt="TearTime reminder window: Time for eye drops, with Done, In 10 min and In 30 min buttons" width="840" height="420" loading="lazy">
+  <img src="/img/history-en.png" alt="TearTime history grid showing eye drop use per day over the last 20 weeks" width="714" height="356" loading="lazy">
+</div>
+
+<section>
+  <h2>Features</h2>
+  <div class="grid">
+    <div class="card"><h3>Screen time based</h3><p>Pauses when you step away for more than 2 minutes. Pick an interval from 20 to 120 minutes.</p></div>
+    <div class="card"><h3>Daily limit</h3><p>Counts today's drops and stops reminding you once you hit your limit (6 by default).</p></div>
+    <div class="card"><h3>History grid</h3><p>A GitHub-style grid of the last 20 weeks. Days over your limit turn orange.</p></div>
+    <div class="card"><h3>One tiny drop icon</h3><p>Takes almost no menu bar space. One click to log "I just used drops".</p></div>
+    <div class="card"><h3>5 languages</h3><p>English, Korean, Japanese, German, Simplified Chinese. Follows your Mac's language.</p></div>
+    <div class="card"><h3>Private by design</h3><p>No account, no server. Your data stays on your Mac, and the code is open.</p></div>
+  </div>
+</section>
+
+<section id="install">
+  <h2>Install</h2>
+  <ol>
+    <li>Download <a href="https://github.com/d4ymonth/teartime/releases/latest/download/TearTime.zip">TearTime.zip</a>, unzip it, and move <code>TearTime.app</code> to Applications.</li>
+    <li>On first launch macOS says it cannot verify the app, because it is distributed outside the App Store and not notarized. Click <b>Done</b>.</li>
+    <li>Open <b>System Settings &gt; Privacy &amp; Security</b>, scroll down, and click <b>Open Anyway</b>.</li>
+    <li>A drop icon appears in your menu bar. Click it, then <b>Settings…</b> to set the interval, daily limit and launch at login.</li>
+  </ol>
+  <p>Or, from Terminal:</p>
+  <pre><code>xattr -dr com.apple.quarantine /Applications/TearTime.app</code></pre>
+</section>
+
+<section>
+  <h2>FAQ</h2>
+  <details><summary>Is TearTime free?</summary><p>Yes, and the <a href="https://github.com/d4ymonth/teartime">source code is on GitHub</a>.</p></details>
+  <details><summary>macOS says it cannot verify the app.</summary><p>That warning appears for apps that are not notarized by Apple. Follow step 3 of <a href="#install">Install</a>.</p></details>
+  <details><summary>Does it send my data anywhere?</summary><p>No. Your history and settings stay on your Mac.</p></details>
+  <details><summary>How is this different from a 20-20-20 break timer?</summary><p>Break timers remind you to look away. TearTime is about eye drops: today's count, a daily limit, and a long-term history.</p></details>
+</section>
+</main>
+
+<footer>
+  <p>TearTime is not a medical device and does not replace medical advice. Follow your doctor's or pharmacist's directions for eye drops.</p>
+  <p>Feedback: <a href="mailto:d4ymonth@gmail.com">d4ymonth@gmail.com</a>, <a href="https://github.com/d4ymonth/teartime/issues">GitHub Issues</a>. MIT License.</p>
+</footer>
+</div>
+</body>
+</html>
