@@ -3,7 +3,7 @@
 # 실행: ./build.sh  (결과: build/TearTime.app, build/TearTime.zip)
 set -e
 cd "$(dirname "$0")"
-VER=0.1
+VER=0.2
 APP="build/TearTime.app"
 rm -rf build && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/ko.lproj" "$APP/Contents/Resources/en.lproj"
 for arch in arm64 x86_64; do
@@ -39,5 +39,5 @@ iconutil -c icns build/AppIcon.iconset -o "$APP/Contents/Resources/AppIcon.icns"
 echo 'CFBundleDisplayName = "인공눈물 타이머";' > "$APP/Contents/Resources/ko.lproj/InfoPlist.strings"
 echo 'CFBundleDisplayName = "TearTime";' > "$APP/Contents/Resources/en.lproj/InfoPlist.strings"
 codesign -s - --force "$APP"
-ditto -c -k --keepParent "$APP" build/TearTime.zip
+ditto -c -k --norsrc --noextattr --keepParent "$APP" build/TearTime.zip
 echo "built $APP, build/TearTime.zip"

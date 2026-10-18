@@ -28,22 +28,33 @@ final class Model: ObservableObject {
         if count > 0 { history[day] = count }
     }
 
-    static func today(_ now: Date = Date()) -> String {
-        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd"; return f.string(from: now)
-    }
+    // 기록 키는 지역 달력(불기, 일본 연호, 아랍 숫자 등)과 무관하게 항상 양력 yyyy-MM-dd 로 쓴다.
+    static let keyFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.calendar = Calendar(identifier: .gregorian)
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
+    static func today(_ now: Date = Date()) -> String { keyFormatter.string(from: now) }
 
     var remainingMin: Int { max(0, Int((Double(intervalMin * 60) - activeSec) / 60)) }
     var capReached: Bool { count >= dailyCap }
 
     /// 주기마다 호출. 알림을 띄워야 하면 true.
     func tick(elapsed: Double, idle: Double, now: Date = Date()) -> Bool {
-        let t = Model.today(now)
-        if t != day { day = t; count = 0; activeSec = 0 }
+        rollover(now)
         if idle < idleLimit { activeSec += elapsed }
         return activeSec >= Double(intervalMin * 60) && !capReached && now >= snoozeUntil
     }
 
-    func logDrop() { count += 1; activeSec = 0; lastDrop = Date(); Reminder.hide() }
+    /// 날짜가 바뀌었으면 오늘 횟수를 0부터 다시 센다. 기록, 표시 전에 항상 먼저 부른다.
+    func rollover(_ now: Date = Date()) {
+        let t = Model.today(now)
+        if t != day { day = t; count = 0; activeSec = 0 }
+    }
+
+    func logDrop(_ now: Date = Date()) { rollover(now); count += 1; activeSec = 0; lastDrop = Date(); Reminder.hide() }
     func snooze(_ min: Int) { snoozeUntil = Date().addingTimeInterval(Double(min * 60)); Reminder.hide() }
 }
 
@@ -151,6 +162,7 @@ struct MenuView: View {
         }
         .padding(14)
         .frame(width: 300)
+        .onAppear { m.rollover() }
     }
 }
 
@@ -261,11 +273,16 @@ struct TearTimeApp: App {
 
 // MenuBarExtra 내용은 메뉴를 열 때만 그려져서 onReceive가 안 돈다. 타이머는 앱 시작 시 따로 건다.
 extension TearTimeApp {
+    // 타이머가 늦게 불려도(App Nap, 부하) 실제 흐른 시간을 센다. 잠자기 같은 긴 공백은 최대 2분만 인정.
+    static var lastTick = Date()
     static let ticker: Timer = {
         let t = Timer(timeInterval: 30, repeats: true) { _ in
+            let now = Date()
+            let elapsed = min(max(0, now.timeIntervalSince(lastTick)), Model.shared.idleLimit)
+            lastTick = now
             let idle = CGEventSource.secondsSinceLastEventType(.combinedSessionState,
                                                                 eventType: CGEventType(rawValue: ~0)!)
-            if Model.shared.tick(elapsed: 30, idle: idle) { Reminder.show() }
+            if Model.shared.tick(elapsed: elapsed, idle: idle, now: now) { Reminder.show() }
         }
         RunLoop.main.add(t, forMode: .common)
         return t
@@ -284,6 +301,14 @@ func selfTest() {
     precondition(!m.tick(elapsed: 0, idle: 0, now: now.addingTimeInterval(86400)) && m.count == 0) // 다음 날 초기화
     m.history = [:]; m.count = 3
     precondition(m.history[m.day] == 3)                               // 횟수 바뀌면 그날 기록에 남음
+    m.day = Model.today(now.addingTimeInterval(-86400)); m.count = 4  // 어제 4회인 상태에서
+    m.logDrop(now)                                                    // 자정 지나 첫 tick 전에 넣으면
+    precondition(m.day == Model.today(now) && m.count == 1 && m.history[m.day] == 1)  // 오늘 1회로 기록
+    precondition(Model.today(Date(timeIntervalSince1970: 1_767_312_000)) == "2026-01-02")  // 달력 설정과 무관한 양력 키
+    for (k, v) in strings {                                           // 언어별 서식 자리표시자가 같아야 함
+        let spec = { (t: String) in t.components(separatedBy: "%").dropFirst().map { $0.prefix(1) } }
+        precondition(v.allSatisfy { spec($0) == spec(v[0]) }, "placeholder mismatch: \(k)")
+    }
     precondition(strings.values.allSatisfy { $0.count == langs.count })   // 모든 문구가 5개 언어를 다 가짐
     print(L("title"), L("today", 3, 6), L("next", 42))
     print("selftest ok")
