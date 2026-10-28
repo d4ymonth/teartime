@@ -3,7 +3,7 @@
 # 실행: ./build.sh  (결과: build/TearTime.app, build/TearTime.zip)
 set -e
 cd "$(dirname "$0")"
-VER=0.2
+VER=0.2.1
 APP="build/TearTime.app"
 rm -rf build && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/ko.lproj" "$APP/Contents/Resources/en.lproj"
 for arch in arm64 x86_64; do

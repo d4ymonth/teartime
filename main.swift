@@ -232,16 +232,14 @@ struct HistoryGrid: View {
     }
 }
 
-// 피드백은 기본 메일 앱으로 보낸다. 받는 주소는 여기 한 곳만 바꾸면 된다.
-let feedbackEmail = "d4ymonth@users.noreply.github.com"
+// 피드백은 GitHub Issues 새 글 화면으로 보낸다. 받는 곳은 여기 한 곳만 바꾸면 된다.
+let feedbackURL = "https://github.com/d4ymonth/teartime/issues/new"
 
 func sendFeedback() {
     let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "dev"
     let os = ProcessInfo.processInfo.operatingSystemVersionString
-    var c = URLComponents()
-    c.scheme = "mailto"
-    c.path = feedbackEmail
-    c.queryItems = [URLQueryItem(name: "subject", value: L("fbSubject")),
+    var c = URLComponents(string: feedbackURL)!
+    c.queryItems = [URLQueryItem(name: "title", value: L("fbSubject")),
                     URLQueryItem(name: "body", value: "\n\n\n---\nTearTime \(v) / macOS \(os) / \(Locale.preferredLanguages.first ?? "")")]
     if let url = c.url { NSWorkspace.shared.open(url) }
 }
